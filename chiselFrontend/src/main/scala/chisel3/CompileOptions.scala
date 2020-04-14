@@ -22,6 +22,8 @@ trait CompileOptions {
   val explicitInvalidate: Boolean
   // Should the reset type of Module be a Bool or a Reset
   val inferModuleReset: Boolean
+  // removes print, dontTouch and assert
+  val removeDebugStuff: Boolean = false
 }
 
 object CompileOptions {

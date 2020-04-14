@@ -53,14 +53,16 @@ object assert { // scalastyle:ignore object.name
 
   def apply_impl_do(cond: Bool, line: String, message: Option[String], data: Bits*)(implicit sourceInfo: SourceInfo, compileOptions: CompileOptions) { // scalastyle:ignore line.size.limit
     val escLine = line.replaceAll("%", "%%")
-    when (!(cond || Module.reset.asBool)) {
-      val fmt = message match {
-        case Some(msg) =>
-          s"Assertion failed: $msg\n    at $escLine\n"
-        case None => s"Assertion failed\n    at $escLine\n"
+    if(!compileOptions.removeDebugStuff) {
+      when(!(cond || Module.reset.asBool)) {
+        val fmt = message match {
+          case Some(msg) =>
+            s"Assertion failed: $msg\n    at $escLine\n"
+          case None => s"Assertion failed\n    at $escLine\n"
+        }
+        printf.printfWithoutReset(fmt, data: _*)
+        pushCommand(Stop(sourceInfo, Builder.forcedClock.ref, 1))
       }
-      printf.printfWithoutReset(fmt, data:_*)
-      pushCommand(Stop(sourceInfo, Builder.forcedClock.ref, 1))
     }
   }
 

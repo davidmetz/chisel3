@@ -28,10 +28,12 @@ object dontTouch { // scalastyle:ignore object.name
     * @return Unmodified signal `data`
     */
   def apply[T <: Data](data: T)(implicit compileOptions: CompileOptions): T = {
-    if (compileOptions.checkSynthesizable) {
-      requireIsHardware(data, "Data marked dontTouch")
+    if(!compileOptions.removeDebugStuff) {
+      if (compileOptions.checkSynthesizable) {
+        requireIsHardware(data, "Data marked dontTouch")
+      }
+      annotate(new ChiselAnnotation { def toFirrtl = DontTouchAnnotation(data.toNamed) })
     }
-    annotate(new ChiselAnnotation { def toFirrtl = DontTouchAnnotation(data.toNamed) })
     data
   }
 }
