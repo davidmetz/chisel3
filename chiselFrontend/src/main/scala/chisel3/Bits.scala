@@ -152,9 +152,14 @@ sealed abstract class Bits(private[chisel3] val width: Width) extends Element wi
     */
   final def apply(x: Int, y: Int): UInt = macro SourceInfoTransform.xyArg
 
+  def callStack = try { throw new Exception} catch { case ex => ex.getStackTrace drop 2 }
+
+  def printStackTrace = callStack drop 1 /* don't print ourselves! */ foreach println
+
   /** @group SourceInfoTransformMacro */
   final def do_apply(x: Int, y: Int)(implicit sourceInfo: SourceInfo, compileOptions: CompileOptions): UInt = {
     if (x < y || y < 0) {
+      printStackTrace
       Builder.error(s"Invalid bit range ($x,$y)")
     }
     val w = x - y + 1
